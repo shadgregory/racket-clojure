@@ -26,6 +26,8 @@ foo
 (loop [x 3 y 5]
   (+ x y))
 
+;; TODO: make `nil` reader syntax
+(check-equal? (if #f 5) #f)
 
 (check-equal?
  (loop [x 5 n 1]
@@ -55,6 +57,10 @@ foo
 (check-equal?
  (->> 5 (+ 3) (/ 2) (- 1))
  (/ 3 4))
+
+(check-equal?
+  (->> 1 ((fn [x] (+ x 1))))
+  2)
 
 ;; quote behavior
 (check-equal? (quote a b c d) (quote a))
