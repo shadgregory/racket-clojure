@@ -8,17 +8,18 @@
                      syntax/parse))
 
 (provide (except-out (all-from-out racket/base)
-                     add1 sub1 if cond #%app quote)
+                     add1 sub1 if let cond #%app quote)
          (rename-out [-#%app #%app]
                      [-quote quote]
                      [sub1 dec]
                      [add1 inc]
                      [clojure:cond cond]
+                     [clojure:let let]
                      [clojure:if if])
-         def do let fn defn loop recur
+         def do fn defn loop recur
          -> ->>
          partial comp complement constantly
-         map true false nil nth)
+         map spit true false nil nth)
 
 (define-syntax-parameter recur
   (λ (stx)
@@ -44,7 +45,7 @@
     #:description "binding pair"
     (pattern (~seq name:id val:expr))))
 
-(define-syntax (let stx)
+(define-syntax (clojure:let stx)
   (syntax-parse stx
     [(_ (~and binding-list [p:binding-pair ...])
         body:expr ...)
@@ -182,6 +183,21 @@
 	     (> position (sequence-length coll)))
 	 error-msg
 	 (sequence-ref coll position))]))
+
+;; files
+(define-syntax (spit stx)
+  (syntax-parse stx
+                ((_ out:expr content:expr (~optional (~seq a:key b:expr)))
+                 (with-syntax ([append-var (attribute b)]
+                               [key-word (attribute a)])
+                   #'(begin 
+                       (if append-var
+                           (let ((f (open-output-file out #:exists 'append)))
+                             (write content f)
+                             (close-output-port f))
+                           (let ((f (open-output-file out #:exists 'replace)))
+                             (write content f)
+                             (close-output-port f))))))))
 
 ;; useful functions
 (require racket/function)

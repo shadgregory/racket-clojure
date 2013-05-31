@@ -109,3 +109,5 @@ foo
 (check-equal? (nth "Hello" 0) #\H)
 (check-equal? (nth '(1 2 3) 0) 1)
 
+(spit "test.txt" "this is a test ")
+(spit "test.txt" " appending to test " :append true)
